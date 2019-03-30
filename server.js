@@ -7,10 +7,14 @@ const express = require('express');
 const exphbs  = require('express-handlebars');
 const path = require('path');
 const request = require('request');
+<<<<<<< HEAD
+const firebase = require("firebase");
+=======
 const firebase = require('firebase');
+>>>>>>> 0a495a45eee8d4a55c1e5b62db836fa2d01e8965
 const http = require('http');
 const socket = require('socket.io');
-
+const rp = require('request-promise');
 
 /***** Front End Setup *****/
 const app = express();
@@ -32,11 +36,15 @@ io.on('connection', (client) => {
  * Returns the list of points to generate on front page in JSON format
  */
 app.get('/', (req, res) => {
+<<<<<<< HEAD
+  // return res.json({
+=======
   let dataObject = {
     "ok": "ok"
   }
   res.render("index", dataObject);
   //return res.json({
+>>>>>>> 0a495a45eee8d4a55c1e5b62db836fa2d01e8965
   //})
 })
 
@@ -55,9 +63,14 @@ app.post('/route', (req, res) => {
  * Adds a new crime to the database
  * Updates the webpage to display the crime location
  */
- app.post('/report', (req, res) => {
- });
+app.post('/report', (req, res) => {
+});
 
+app.post('/latlng', (req, res) => {
+  console.log("request was made: /latlng");
+  res.writeHead(200, {'Content-Type': 'application/json'});
+  res.end(JSON.stringify(req));
+});
 
 /***** Listen to port *****/
 const port = process.env.PORT || 3000;
@@ -84,13 +97,48 @@ console.log("firebase is setup!");
 const db = firebase.firestore();
 const collection = db.collection("avoid-points");
 
+
+// link to geocoding API
+const geocodingAPI = "http://www.mapquestapi.com/geocoding/v1/address"
+// conversion
+let latLngDict = {
+  "lat": 0,
+  "long": 0
+}
 /**
  * @function addCrime Updates the database with a new crime location
  * @param {string} location The location of the crime
  * @param {string} description of the crime
  */
- function addCrime(location, crime) {
+ async function addCrime(location, crime) {
    let docRef = collection.doc(location);
+<<<<<<< HEAD
+   this.latLngDict = await convertAddress(location);
+   docRef.get().
+     then(function(doc){
+       if (doc.exists){
+          console.log("this entry exists already");
+          console.log(doc.data().num);
+          let newNum = doc.data().num+1;
+          docRef.update({
+            "num": newNum
+          })
+       }
+       else{
+          console.log("this entry does not exist");
+          // console.log(this.latLngDict["lat"]);
+          // console.log(this.latLngDict["long"])
+          docRef.set({
+            "lat": this.latLngDict["lat"], // these values would need to be looked up
+            "long": this.latLngDict["lng"],
+            "num": 1,
+            "crime": crime
+          });
+       }
+  })
+   .catch(function(err){
+      console.log(err);
+=======
    docRef.get().then(function(doc){
     if (doc.exists){
       docRef.num+=1;
@@ -103,10 +151,11 @@ const collection = db.collection("avoid-points");
         "crime": crime
       })
     }
+>>>>>>> 0a495a45eee8d4a55c1e5b62db836fa2d01e8965
    });
  }
 
- addCrime("13138 Waco St", "some shit");
+addCrime("13138 Waco St", "some shit");
 
  /**
   * @function nearCrimes Makes a list of crimes that appear in the area between
@@ -116,16 +165,78 @@ const collection = db.collection("avoid-points");
   * @return {Array} An array of crime points
   */
 function nearCrimes(location1, location2) {
+  let geoLoc1 = convertAddress(location1);
+  let geoLoc2 = convertAddress(location2);
+  let query;
+  if (geoLoc1["lat"] > geoLoc2["lat"]){
+    query = collection.where("lat", "<=", geoLoc1["lat"]).where("lat", ">=", geoLoc2["lat"]);
+  }
+  else{
+    query = collection.where("lat", ">=", geoLoc1["lat"]).where("lat", "<=", geoLoc2["lat"]);
+  }
 
+  if (geoLoc1["long"] > geoLoc2["long"]){
+    query = collection.where("long", "<=", geoLoc1["long"]).where("long", ">=", geoLoc2["long"]);
+  }
+  else{
+    query = collection.where("long", ">=", geoLoc1["long"]).where("long", "<=", geoLoc2["long"]);
+  }
 }
 
-// link to geocoding API
-const geocoding = "http://www.mapquestapi.com/geocoding/v1/address"
+
 
 /**
  * @function convertAddress Converts a String location to a lat/lng
  *
  * @param {string} location The location
+<<<<<<< HEAD
+ * @return {Dict} a dict representing latitude and longitude
+ */
+async function convertAddress(location){
+  let properties = {
+    key: config.mapquest,
+    location: location
+  }
+  // rp({url:geocodingAPI, qs:properties}, function(err, response, body) {
+  //   if(err) { console.log(err); return; }
+  //   // console.log(body);
+  //   let dict = JSON.parse(body);
+  //   let latLng = dict["results"][0]["locations"][0]["latLng"];
+  //   dict = latLng;
+  //   return dict
+  // }).then(function(dict){
+  //   let arr = [dict["lat"], dict["lng"]];
+  //   return arr;
+  // }).catch(function(err){
+  //   console.log("conversion failed");
+  // });
+
+  let options = {
+    uri: geocodingAPI,
+    qs: properties,
+    headers: {
+      'User-Agent': 'Request-Promise'
+    },
+    json: true
+  }
+  await rp({url:geocodingAPI, qs:properties})
+    .then(function (data){
+      // console.log(data);
+      conversionHelper(JSON.parse(data)["results"][0]["locations"][0]["latLng"]);
+
+    })
+    .catch(function(err){
+      console.log(err);
+    });
+  return this.latLngDict;
+}
+
+
+
+function conversionHelper(dict){
+  this.latLngDict = dict;
+  console.log(dict);
+=======
  * @return {Array} An array representing latitude and longitude
  */
 function convertAddress(location){
@@ -134,6 +245,7 @@ function convertAddress(location){
   //   location: location
   // }
   // let result = JSON.parse()
+>>>>>>> 0a495a45eee8d4a55c1e5b62db836fa2d01e8965
 }
 
 
