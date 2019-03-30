@@ -12,9 +12,6 @@ const cors = require('cors');
 
 /***** Front End Setup *****/
 const app = express();
-app.set('views', path.join(__dirname, 'views'));
-app.engine('handlebars', exphbs({defaultLayout: 'main'}));
-app.set('view engine', 'handlebars');
 app.use(cors());
 
 /**
@@ -28,10 +25,6 @@ app.get('/', (req, res) => {
 
 /***** Requests *****/
 app.get('/', function(req, res) {
-  res.render('home', {
-    content: 'This is some content',
-    published: true
-  });
 });
 
 /**
@@ -48,7 +41,6 @@ app.post('/route', (req, res) => {
  * Updates the webpage to display the crime location
  */
  app.post('/report', (req, res) => {
-
  });
 
 
