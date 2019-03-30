@@ -1,17 +1,30 @@
 /***** Config File *****/
 global.config = require('./config.json');
 
+
 /***** Import Modules *****/
 const express = require('express');
 const path = require('path');
 const exphbs  = require('express-handlebars');
 const request = require('request');
+const cors = require('cors');
+
 
 /***** Front End Setup *****/
 const app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.engine('handlebars', exphbs({defaultLayout: 'main'}));
 app.set('view engine', 'handlebars');
+app.use(cors());
+
+/**
+ * Home Page
+ * Returns the list of points to generate on front page in JSON format
+ */
+app.get('/', (req, res) => {
+  //return res.json({
+  //})
+})
 
 /***** Requests *****/
 app.get('/', function(req, res) {
@@ -26,7 +39,7 @@ app.get('/', function(req, res) {
  * Calculates the route between two locations using MapQuest's API
  * Updates the webpage to display the route and directions
  */
-app.post('/route', function(req, res) {
+app.post('/route', (req, res) => {
 });
 
 /**
@@ -34,9 +47,10 @@ app.post('/route', function(req, res) {
  * Adds a new crime to the database
  * Updates the webpage to display the crime location
  */
- app.post('/report', function(req, res) {
+ app.post('/report', (req, res) => {
 
  });
+
 
 /***** Listen to port *****/
 const port = process.env.PORT || 3000;
@@ -44,7 +58,6 @@ app.listen(port, '0.0.0.0', () => {
   console.log(`Listening on Port ${port}`);
 });
 
-app.use(express.static('public'));
 
 /***** Firebase Functions *****/
 
