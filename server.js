@@ -3,16 +3,25 @@ global.config = require('./config.json');
 
 
 /***** Import Modules *****/
-const express = require('express');
-const path = require('path');
-const exphbs  = require('express-handlebars');
-const request = require('request');
 const cors = require('cors');
+const express = require('express');
+const exphbs  = require('express-handlebars');
+const path = require('path');
+const request = require('request');
+const http = require('http');
+const socket = require('socket.io');
 
 
 /***** Front End Setup *****/
 const app = express();
 app.use(cors());
+const server = http.createServer(app);
+const io = socket.listen(server);
+
+/* Socket.io check listen */
+io.on('connection', (client) => {
+  console.log(`${client} is connected`);
+});
 
 /**
  * Home Page
@@ -24,8 +33,6 @@ app.get('/', (req, res) => {
 })
 
 /***** Requests *****/
-app.get('/', function(req, res) {
-});
 
 /**
  * Handle the request for when a new route is requested
@@ -45,8 +52,8 @@ app.post('/route', (req, res) => {
 
 
 /***** Listen to port *****/
-const port = process.env.PORT || 3000;
-app.listen(port, '0.0.0.0', () => {
+const port = process.env.PORT || 4000;
+server.listen(port, '0.0.0.0', () => {
   console.log(`Listening on Port ${port}`);
 });
 
