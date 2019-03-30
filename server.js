@@ -7,14 +7,22 @@ const express = require('express');
 const exphbs  = require('express-handlebars');
 const path = require('path');
 const request = require('request');
+<<<<<<< HEAD
 const firebase = require("firebase");
+=======
+const firebase = require('firebase');
+>>>>>>> 0a495a45eee8d4a55c1e5b62db836fa2d01e8965
 const http = require('http');
 const socket = require('socket.io');
 const rp = require('request-promise');
 
 /***** Front End Setup *****/
 const app = express();
-app.use(cors());
+app.engine('handlebars', exphbs({ defaultLayout: 'main' }));
+app.set('view engine', 'handlebars');
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Socket.io is set to listen to port 3000, which should house the front-end
 const server = http.createServer(app);
 const io = socket.listen(server);
 
@@ -28,7 +36,15 @@ io.on('connection', (client) => {
  * Returns the list of points to generate on front page in JSON format
  */
 app.get('/', (req, res) => {
+<<<<<<< HEAD
   // return res.json({
+=======
+  let dataObject = {
+    "ok": "ok"
+  }
+  res.render("index", dataObject);
+  //return res.json({
+>>>>>>> 0a495a45eee8d4a55c1e5b62db836fa2d01e8965
   //})
 })
 
@@ -57,7 +73,7 @@ app.post('/latlng', (req, res) => {
 });
 
 /***** Listen to port *****/
-const port = process.env.PORT || 4000;
+const port = process.env.PORT || 3000;
 server.listen(port, '0.0.0.0', () => {
   console.log(`Listening on Port ${port}`);
 });
@@ -96,6 +112,7 @@ let latLngDict = {
  */
  async function addCrime(location, crime) {
    let docRef = collection.doc(location);
+<<<<<<< HEAD
    this.latLngDict = await convertAddress(location);
    docRef.get().
      then(function(doc){
@@ -121,6 +138,20 @@ let latLngDict = {
   })
    .catch(function(err){
       console.log(err);
+=======
+   docRef.get().then(function(doc){
+    if (doc.exists){
+      docRef.num+=1;
+    }
+    else{
+      docRef.set({
+        "lat": 0.0, // these values would need to be looked up
+        "long": 0.0,
+        "num": 1,
+        "crime": crime
+      })
+    }
+>>>>>>> 0a495a45eee8d4a55c1e5b62db836fa2d01e8965
    });
  }
 
@@ -158,6 +189,7 @@ function nearCrimes(location1, location2) {
  * @function convertAddress Converts a String location to a lat/lng
  *
  * @param {string} location The location
+<<<<<<< HEAD
  * @return {Dict} a dict representing latitude and longitude
  */
 async function convertAddress(location){
@@ -204,6 +236,16 @@ async function convertAddress(location){
 function conversionHelper(dict){
   this.latLngDict = dict;
   console.log(dict);
+=======
+ * @return {Array} An array representing latitude and longitude
+ */
+function convertAddress(location){
+  // let properties = {
+  //   key: config.mapquest,
+  //   location: location
+  // }
+  // let result = JSON.parse()
+>>>>>>> 0a495a45eee8d4a55c1e5b62db836fa2d01e8965
 }
 
 
@@ -211,6 +253,7 @@ function conversionHelper(dict){
 
 // Link to the MapQuest API
 const routeApi = 'http://www.mapquestapi.com/directions/v2/route';
+const staticMapApi = 'https://www.mapquestapi.com/staticmap/v5/map';
 
 /**
  * @function findRoute Finds the route to a destination
@@ -220,16 +263,21 @@ const routeApi = 'http://www.mapquestapi.com/directions/v2/route';
  * @return The route to the destination
  */
 function findRoute(location, destination, avoidances) {
-  let properties = {
+  let routeProp = {
     key:config.mapquest,
     from:location,
     to:destination
   };
-  request({url:routeApi, qs:properties}, function(err, response, body) {
+
+  // Make a request to find the route
+  request({url:routeApi, qs:routeProp}, (err, response, body) => {
     if(err) { console.log(err); return; }
-    //console.log(body);
+    let routeBody = JSON.parse(body).route;
+    console.log(routeBody.sessionId);
+    console.log(`${staticMapApi}?start=${location}&end=${destination}&
+                 size=600,400@2x&key=${config.mapquest}&session=${routeBody.sessionId}`);
   });
   // return
 }
 
-// findRoute('Clarendon Blvd,Arlington,VA','2400 S Glebe Rd,Arlington,VA');
+findRoute('453 S Spring St, Los Angeles,CA','317 S Broadway, Los Angeles, CA');
