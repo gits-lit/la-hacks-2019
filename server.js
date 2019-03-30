@@ -15,8 +15,9 @@ const socket = require('socket.io');
 /***** Front End Setup *****/
 const app = express();
 app.use(cors());
+// Socket.io is set to listen to port 3000, which should house the front-end
 const server = http.createServer(app);
-const io = socket.listen(server);
+const io = socket(server);
 
 /* Socket.io check listen */
 io.on('connection', (client) => {
@@ -52,7 +53,7 @@ app.post('/route', (req, res) => {
 
 
 /***** Listen to port *****/
-const port = process.env.PORT || 4000;
+const port = process.env.PORT || 3000;
 server.listen(port, '0.0.0.0', () => {
   console.log(`Listening on Port ${port}`);
 });
@@ -85,6 +86,7 @@ server.listen(port, '0.0.0.0', () => {
 
 // Link to the MapQuest API
 const routeApi = 'http://www.mapquestapi.com/directions/v2/route';
+const staticMapApi = 'https://www.mapquestapi.com/staticmap/v5/map';
 
 /**
  * @function findRoute Finds the route to a destination
@@ -94,16 +96,21 @@ const routeApi = 'http://www.mapquestapi.com/directions/v2/route';
  * @return The route to the destination
  */
 function findRoute(location, destination, avoidances) {
-  let properties = {
+  let routeProp = {
     key:config.mapquest,
     from:location,
     to:destination
   };
-  request({url:routeApi, qs:properties}, function(err, response, body) {
+
+  // Make a request to find the route
+  request({url:routeApi, qs:routeProp}, (err, response, body) => {
     if(err) { console.log(err); return; }
-    //console.log(body);
+    let routeBody = JSON.parse(body).route;
+    console.log(routeBody.sessionId);
+    console.log(`${staticMapApi}?start=${location}&end=${destination}&
+                 size=600,400@2x&key=${config.mapquest}&session=${routeBody.sessionId}`);
   });
   // return
 }
 
-// findRoute('Clarendon Blvd,Arlington,VA','2400 S Glebe Rd,Arlington,VA');
+findRoute('453 S Spring St, Los Angeles,CA','317 S Broadway, Los Angeles, CA');
