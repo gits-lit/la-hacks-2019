@@ -1,0 +1,23 @@
+{
+  "name": "la-hacks-2019",
+  "version": "1.0.0",
+  "description": "We are hacking LA",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gits-lit/la-hacks-2019.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gits-lit/la-hacks-2019/issues"
+  },
+  "homepage": "https://github.com/gits-lit/la-hacks-2019#readme",
+  "dependencies": {
+    "cors": "^2.8.5"
+  }
+}

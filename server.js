@@ -1,6 +1,6 @@
 /***** Config File *****/
 global.config = require('./config.json');
-
+global.fb = require('./firebase_auth.json');
 
 /***** Import Modules *****/
 const express = require('express');
@@ -8,7 +8,7 @@ const path = require('path');
 const exphbs  = require('express-handlebars');
 const request = require('request');
 const cors = require('cors');
-
+const firebase = require("firebase");
 
 /***** Front End Setup *****/
 const app = express();
@@ -61,14 +61,45 @@ app.listen(port, '0.0.0.0', () => {
 
 /***** Firebase Functions *****/
 
+// firebase setup
+const fb_config = {
+  apiKey: fb.apiKey, 
+  authDomain: fb.authDomain,
+  databaseURL: fb.databaseURL,
+  projectId: fb.projectId,
+  storageBucket: fb.storageBucket,
+  messagingSenderId: fb.messagingSenderId
+}
+firebase.initializeApp(fb_config);
+console.log("firebase is setup!");
+
+// firebase variables
+const db = firebase.firestore();
+const collection = db.collection("avoid-points");
+
 /**
  * @function addCrime Updates the database with a new crime location
  * @param {string} location The location of the crime
- * @param {number} weight The severity of the crime
+ * @param {string} description of the crime 
  */
- function addCrime(location, weight) {
-
+ function addCrime(location, crime) {
+   let docRef = collection.doc(location);
+   docRef.get().then(function(doc){
+    if (doc.exists){
+      docRef.num+=1; 
+    }
+    else{
+      docRef.set({
+        "lat": 0.0, // these values would need to be looked up 
+        "long": 0.0,
+        "num": 1,
+        "crime": crime 
+      })
+    }
+   });
  }
+
+ addCrime("13138 Waco St", "some shit");
 
  /**
   * @function nearCrimes Makes a list of crimes that appear in the area between
@@ -77,9 +108,26 @@ app.listen(port, '0.0.0.0', () => {
   * @param {string} location2 The second location
   * @return {Array} An array of crime points
   */
-  function nearCrimes(location1, location2) {
+function nearCrimes(location1, location2) {
 
-  }
+}
+
+// link to geocoding API
+const geocoding = "http://www.mapquestapi.com/geocoding/v1/address"
+
+/**
+ * @function convertAddress Converts a String location to a lat/lng
+ *
+ * @param {string} location The location
+ * @return {Array} An array representing latitude and longitude 
+ */
+function convertAddress(location){
+  // let properties = {
+  //   key: config.mapquest, 
+  //   location: location
+  // }
+  // let result = JSON.parse()
+}
 
 
 /***** MapQuest API Functions *****/
