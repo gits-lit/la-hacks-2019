@@ -1,6 +1,5 @@
 /***** Config File *****/
 global.config = require('./config.json');
-global.fb = require('./firebase_auth.json');
 
 /***** Import Modules *****/
 const cors = require('cors');
@@ -8,18 +7,20 @@ const express = require('express');
 const exphbs  = require('express-handlebars');
 const path = require('path');
 const request = require('request');
-const cors = require('cors');
-const firebase = require("firebase");
+const firebase = require('firebase');
 const http = require('http');
 const socket = require('socket.io');
 
 
 /***** Front End Setup *****/
 const app = express();
-app.use(cors());
+app.engine('handlebars', exphbs({ defaultLayout: 'main' }));
+app.set('view engine', 'handlebars');
+app.use(express.static(path.join(__dirname, 'public')));
+
 // Socket.io is set to listen to port 3000, which should house the front-end
 const server = http.createServer(app);
-const io = socket(server);
+const io = socket.listen(server);
 
 /* Socket.io check listen */
 io.on('connection', (client) => {
@@ -31,6 +32,10 @@ io.on('connection', (client) => {
  * Returns the list of points to generate on front page in JSON format
  */
 app.get('/', (req, res) => {
+  let dataObject = {
+    "ok": "ok"
+  }
+  res.render("index", dataObject);
   //return res.json({
   //})
 })
@@ -65,12 +70,12 @@ server.listen(port, '0.0.0.0', () => {
 
 // firebase setup
 const fb_config = {
-  apiKey: fb.apiKey, 
-  authDomain: fb.authDomain,
-  databaseURL: fb.databaseURL,
-  projectId: fb.projectId,
-  storageBucket: fb.storageBucket,
-  messagingSenderId: fb.messagingSenderId
+  apiKey: config.apiKey,
+  authDomain: config.authDomain,
+  databaseURL: config.databaseURL,
+  projectId: config.projectId,
+  storageBucket: config.storageBucket,
+  messagingSenderId: config.messagingSenderId
 }
 firebase.initializeApp(fb_config);
 console.log("firebase is setup!");
@@ -82,20 +87,20 @@ const collection = db.collection("avoid-points");
 /**
  * @function addCrime Updates the database with a new crime location
  * @param {string} location The location of the crime
- * @param {string} description of the crime 
+ * @param {string} description of the crime
  */
  function addCrime(location, crime) {
    let docRef = collection.doc(location);
    docRef.get().then(function(doc){
     if (doc.exists){
-      docRef.num+=1; 
+      docRef.num+=1;
     }
     else{
       docRef.set({
-        "lat": 0.0, // these values would need to be looked up 
+        "lat": 0.0, // these values would need to be looked up
         "long": 0.0,
         "num": 1,
-        "crime": crime 
+        "crime": crime
       })
     }
    });
@@ -121,11 +126,11 @@ const geocoding = "http://www.mapquestapi.com/geocoding/v1/address"
  * @function convertAddress Converts a String location to a lat/lng
  *
  * @param {string} location The location
- * @return {Array} An array representing latitude and longitude 
+ * @return {Array} An array representing latitude and longitude
  */
 function convertAddress(location){
   // let properties = {
-  //   key: config.mapquest, 
+  //   key: config.mapquest,
   //   location: location
   // }
   // let result = JSON.parse()
