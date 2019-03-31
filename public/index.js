@@ -53,7 +53,7 @@ function routeCallback(error, response) {
     startMarker: {
       icon: 'marker',
       iconOptions: {
-        size: 'sm',
+        size: 'lg',
         primaryColor: "#3cbcbb",
         secondaryColor: '#FFFFFF',
         symbol: 'a'
@@ -62,7 +62,7 @@ function routeCallback(error, response) {
     endMarker: {
       icon: 'marker',
       iconOptions: {
-        size: 'sm',
+        size: 'lg',
         primaryColor: "#3cbcbb",
         secondaryColor: '#FFFFFF',
         symbol: 'b'
@@ -227,6 +227,16 @@ $('#report').click(function() {
   $('.about-container').hide('slide', {direction: 'right'}, 500);
   $('#reportForm').removeClass('success');
 });
+
+$('#close-report').click(function() {
+  $('.report-container').hide('slide', {direction: 'right'}, 500);
+  $('#reportForm').removeClass('success');
+});
+
+$('#close-about').click(function() {
+  $('.about-container').hide('slide', {direction: 'right'}, 500);
+});
+
 $('#report').hover(function() {
   $('#indicator').html('report');
 });
