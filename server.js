@@ -2,7 +2,6 @@
 global.config = require('./config.json');
 
 /***** Import Modules *****/
-const cors = require('cors');
 const express = require('express');
 const exphbs  = require('express-handlebars');
 const path = require('path');

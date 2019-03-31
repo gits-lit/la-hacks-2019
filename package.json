@@ -18,9 +18,14 @@
   },
   "homepage": "https://github.com/gits-lit/la-hacks-2019#readme",
   "dependencies": {
-    "cors": "^2.8.5",
+    "express": "^4.16.4",
+    "express-handlebars": "^3.0.2",
     "firebase": "^5.9.2",
+    "http": "0.0.0",
+    "path": "^0.12.7",
+    "request": "^2.88.0",
     "request-promise": "^4.2.4",
+    "socket.io": "^2.2.0",
     "twilio": "^3.30.0"
   }
 }
