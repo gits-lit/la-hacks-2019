@@ -71,7 +71,27 @@ body {
   color: gray;
 }
 
-#report:hover, #about:hover {
+#pedestrian {
+  position: absolute;
+  bottom: 5vh;
+  font-size: 2.8rem;
+  color: #3cbcbb;
+  right: 10vw;
+  z-index: 10100;
+  transition: all .2s ease-in-out;
+}
+
+#indicator {
+  position: absolute;
+  font-size: 2rem;
+  color: #3cbcbb;
+  right: 16vw;
+  bottom: 7vh;
+  z-index: 101000;
+  transition: all .2s ease-in-out;
+}
+
+#report:hover, #about:hover, #pedestrian:hover {
   cursor: pointer;
   transform: scale(1.2);
 }

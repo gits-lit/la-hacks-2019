@@ -176,10 +176,13 @@ let redIcon = new L.Icon({
   shadowSize: [41, 41]
 });
 
+ped = true;
+
 $('#routeForm').submit(function(){
     let formData = {
       origin: $('#origin').val(),
-      destination: $('#destination').val()
+      destination: $('#destination').val(),
+      pedestrian: ped
     }
 
     socket.emit('route', formData);
@@ -190,22 +193,22 @@ $('#routeForm').submit(function(){
     return false;
   });
 
-  $('#reportForm').submit(function(){
-      let checked = document.getElementById("police").checked;
-      let formData = {
-        address: $('#address').val(),
-        description: $('#description').val(),
-        police: checked
-      }
+$('#reportForm').submit(function(){
+    let checked = document.getElementById("police").checked;
+    let formData = {
+      address: $('#address').val(),
+      description: $('#description').val(),
+      police: checked
+    }
 
-      socket.emit('report', formData);
-      $('#reportForm').addClass('success');
-      document.getElementById('address').value = '';
-      document.getElementById('description').value = '';
-      //socket.emit('message', "Input");
-      //$('#Input').val('');
-      return false;
-    });
+    socket.emit('report', formData);
+    $('#reportForm').addClass('success');
+    document.getElementById('address').value = '';
+    document.getElementById('description').value = '';
+    //socket.emit('message', "Input");
+    //$('#Input').val('');
+    return false;
+  });
 
 socket.on('session', function(data) {
   directions.route(data, routeCallback);
@@ -216,10 +219,45 @@ $('#about').click(function() {
   $('.about-container').toggle('slide', {direction: "right" }, 500);
   $('.report-container').hide('slide', {direction: 'right'}, 500);
 });
+$('#about').hover(function() {
+  $('#indicator').html('about');
+});
 $('#report').click(function() {
   $('.report-container' ).toggle('slide', {direction: "right" }, 500);
   $('.about-container').hide('slide', {direction: 'right'}, 500);
   $('#reportForm').removeClass('success');
+});
+$('#report').hover(function() {
+  $('#indicator').html('report');
+});
+$('#pedestrian').click(function() {
+  ped = !ped;
+  this.classList.toggle("street");
+  this.classList.toggle("car");
+  if(ped) {
+    $('#indicator').html('walk mode');
+  }
+  else {
+    $('#indicator').html('car mode');
+  }
+});
+$('#pedestrian').hover(function() {
+  if(ped) {
+    $('#indicator').html('walk mode');
+  }
+  else {
+    $('#indicator').html('car mode');
+  }
+
+});
+$('#pedestrian').mouseleave(function() {
+  $('#indicator').html('');
+});
+$('#about').mouseleave(function() {
+  $('#indicator').html('');
+});
+$('#report').mouseleave(function() {
+  $('#indicator').html('');
 });
 
 $('.ui.checkbox')
