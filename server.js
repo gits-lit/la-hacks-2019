@@ -24,12 +24,7 @@ app.use(express.static(path.join(__dirname, 'public')));
  * Returns the list of points to generate on front page in JSON format
  */
 app.get('/', (req, res) => {
-  let dataObject = {
-    "ok": "ok"
-  }
-  res.render("index", dataObject);
-  //return res.json({
-  //})
+  res.render("index", markers);
 })
 
 /***** Requests *****/
@@ -111,6 +106,9 @@ console.log("firebase is setup!");
 const db = firebase.firestore();
 const collection = db.collection("avoid-points");
 
+/***** Points for *****/
+markers = []
+controlPoints = []
 
 // link to geocoding API
 const geocodingAPI = "http://www.mapquestapi.com/geocoding/v1/address"
@@ -119,6 +117,42 @@ let latLngDict = {
   "lat": 0,
   "long": 0
 }
+
+function getData() {
+  // Loop through crimes in order with the forEach() method.
+  var query = collection.get()
+  .then(snapshot => {
+    if (snapshot.empty) {
+      console.log('No matching documents.');
+      return;
+    }
+
+    snapshot.forEach(doc => {
+      let dataObject = doc.data;
+      markers.push({
+        lat: dataObject.lat,
+        lng: dataObject.lng,
+        crime: dataObject.crime,
+        weight: dataObject.num
+      });
+
+      controlPoints.push({
+        lat: parseFloat(dataObject.lat),
+        lng: parseFloat(dataObject.lng),
+        weight: parseFloat(dataObject.num),
+        radius: .1
+      })
+      console.log(doc.id, '=>', doc.data());
+    });
+  })
+  .catch(err => {
+    console.log('Error getting documents', err);
+  });
+}
+
+console.log("Get data called");
+getData();
+
 /**
  * @function addCrime Updates the database with a new crime location
  * @param {string} location The location of the crime
@@ -143,7 +177,7 @@ let latLngDict = {
           // console.log(this.latLngDict["long"])
           docRef.set({
             "lat": this.latLngDict["lat"], // these values would need to be looked up
-            "long": this.latLngDict["lng"],
+            "lng": this.latLngDict["lng"],
             "num": 1,
             "crime": crime
           });
