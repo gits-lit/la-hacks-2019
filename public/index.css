@@ -37,6 +37,14 @@ body {
   padding: 30px;
 }
 
+.about-container p{
+  font-size: 20px;
+}
+
+.center{
+  text-align: center;
+}
+
 .report-container {
   position: absolute;
   background-color: white;
