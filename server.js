@@ -295,7 +295,7 @@ async function findRoute(location, destination) {
     start: location,//'N Central Ave, Los Angeles, CA',//routeBody.locations[0].street,
     end: destination,//'1711 W Temple St, Los Angeles, CA',//routeBody.locations[1].street,
     options: {
-        //typeRoute: 'pedestrian',
+        routeType: 'pedestrian',
         routeControlPointCollection: controlPoints
     }
   }

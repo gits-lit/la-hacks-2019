@@ -35,6 +35,48 @@ function routeCallback(error, response) {
       showTraffic: false
     }
   }).addTo(map);
+  let directions = document.getElementById("directions");
+  while (directions.firstChild) {
+      directions.removeChild(directions.firstChild);
+  }
+  let maneuversList = response.route.legs[0].maneuvers;
+  for (let i = 0; i < maneuversList.length; i++) {
+    let element = maneuversList[i];
+    let narrative = element.narrative.toLowerCase();
+    let node = document.createElement('div');
+    node.className = 'item';
+    let icon = document.createElement('i');
+    let direction = 'road';
+
+    if(i == 0) {
+      direction = 'street view'
+    }
+    else if(i == maneuversList.length - 1) {
+      direction = 'flag';
+    }
+    else if(narrative.includes('left') || narrative.includes('west') || narrative.includes(' w ')) {
+      direction = 'chevron circle left';
+    }
+    else if(narrative.includes('right') || narrative.includes('east') || narrative.includes(' e ')) {
+      direction = 'chevron circle right';
+    }
+    else if(narrative.includes('up') || narrative.includes('north') || narrative.includes(' n ')) {
+      direction = 'chevron circle up';
+    }
+    else if(narrative.includes('down') || narrative.includes('south') || narrative.includes(' s ')) {
+      direction = 'chevron circle down';
+    }
+
+    icon.className = `location ${direction} icon`;
+    node.appendChild(icon);
+    let textNode = document.createElement('div');
+    textNode.className='content';
+    textNode.innerHTML = `<div class="description">${element.narrative}</div>`;
+    node.appendChild(textNode);
+    directions.appendChild(node)
+    console.log(element.narrative);
+
+  };
   return map;
 }
 
@@ -85,7 +127,34 @@ $('#routeForm').submit(function(){
     return false;
   });
 
+  $('#reportForm').submit(function(){
+      let formData = {
+        address: $('#address').val(),
+        description: $('#description').val()
+      }
+
+      socket.emit('report', formData);
+      $('#reportForm').addClass('success');
+      document.getElementById('address').value = '';
+      document.getElementById('description').value = '';
+      //socket.emit('message', "Input");
+      //$('#Input').val('');
+      return false;
+    });
+
 socket.on('session', function(data) {
-  console.log(data.sessionId);
   directions.route(data, routeCallback);
 })
+
+/** Animation stuff **/
+$('#about').click(function() {
+  $('.about-container').toggle('slide', {direction: "right" }, 500);
+});
+$('#report').click(function() {
+  $('.report-container' ).toggle('slide', {direction: "right" }, 500);
+  $('#reportForm').removeClass('success');
+});
+
+$('.ui.checkbox')
+  .checkbox()
+;

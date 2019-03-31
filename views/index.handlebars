@@ -10,11 +10,6 @@
       <!--<label>Destination</label>-->
       <input type="text" name="destination" placeholder="destination" id="destination">
     </div>
-    <div class="field">
-      <div class="ui checkbox">
-        <input type="checkbox" tabindex="0" class="hidden">
-      </div>
-    </div>
     <button class="ui animated button" type="submit" tabindex="0">
       <div class="visible content">navigate</div>
       <div class="hidden content">
@@ -23,111 +18,48 @@
     </button>
   </form>
 
-  <div class="ui list" style="padding: 0 5vw;">
-    <div class="item">
-      <i class="location arrow icon"></i>
-      <div class="content">
-        <a class="header">Rachel</a>
-        <div class="description">Last seen watching <a><b>Arrested Development</b></a> just now.</div>
+  <div class="icon-wrapper">
+    <i class="question icon" id="about"></i>
+    <i class="exclamation icon" id="report"></i>
+  </div>
+
+  <div id="directions" class="ui list" style="padding: 0 5vw;">
+    <!--    <div class="item">
+          <i class="location arrow icon"></i>
+          <div class="content">
+            <a class="header">Rachel</a>
+            <div class="description">Last seen watching <a><b>Arrested Development</b></a> just now.</div>
+          </div>
+        </div>-->
+  </div>
+  <div class="about-container">
+
+  </div>
+  <div class="report-container">
+    <h1 class="heading">Report a crime</h1>
+    <form action="http://127.0.0.1:3000/" method="get" class="ui form" id="reportForm">
+      <div class="field">
+        <input type="text" name="address" placeholder="address" id="address">
       </div>
-    </div>
-    <div class="item">
-      <i class="location arrow icon"></i>
-      <div class="content">
-        <a class="header">Lindsay</a>
-        <div class="description">Last seen watching <a><b>Bob's Burgers</b></a> 10 hours ago.</div>
+      <div class="field">
+        <input type="text" name="description" placeholder="description" id="description">
       </div>
-    </div>
-    <div class="item">
-      <i class="location arrow icon"></i>
-      <div class="content">
-        <a class="header">Matthew</a>
-        <div class="description">Last seen watching <a><b>The Godfather Part 2</b></a> yesterday.</div>
+      <div class="inline field">
+        <div class="ui toggle checkbox">
+          <input type="checkbox" tabindex="0" class="hidden">
+          <label>Notify enforcement</label>
+        </div>
       </div>
-    </div>
-    <div class="item">
-      <i class="location arrow icon"></i>
-      <div class="content">
-        <a class="header">Jenny Hess</a>
-        <div class="description">Last seen watching <a><b>Twin Peaks</b></a> 3 days ago.</div>
+      <div class="ui success message">
+        <div class="header">Crime Submitted</div>
+        <p>Thank you for submitting a crime!</p>
       </div>
-    </div>
-    <div class="item">
-      <i class="location arrow icon"></i>
-      <div class="content">
-        <a class="header">Veronika Ossi</a>
-        <div class="description">Has not watched anything recently</div>
-      </div>
-    </div>
-    <div class="item">
-      <i class="location arrow icon"></i>
-      <div class="content">
-        <a class="header">Veronika Ossi</a>
-        <div class="description">Has not watched anything recently</div>
-      </div>
-    </div>
-    <div class="item">
-      <i class="location arrow icon"></i>
-      <div class="content">
-        <a class="header">Veronika Ossi</a>
-        <div class="description">Has not watched anything recently</div>
-      </div>
-    </div>
-    <div class="item">
-      <i class="location arrow icon"></i>
-      <div class="content">
-        <a class="header">Veronika Ossi</a>
-        <div class="description">Has not watched anything recently</div>
-      </div>
-    </div>
-    <div class="item">
-      <i class="location arrow icon"></i>
-      <div class="content">
-        <a class="header">Veronika Ossi</a>
-        <div class="description">Has not watched anything recently</div>
-      </div>
-    </div>
-    <div class="item">
-      <i class="location arrow icon"></i>
-      <div class="content">
-        <a class="header">Veronika Ossi</a>
-        <div class="description">Has not watched anything recently</div>
-      </div>
-    </div>
-    <div class="item">
-      <i class="location arrow icon"></i>
-      <div class="content">
-        <a class="header">Veronika Ossi</a>
-        <div class="description">Has not watched anything recently</div>
-      </div>
-    </div>
-    <div class="item">
-      <i class="location arrow icon"></i>
-      <div class="content">
-        <a class="header">Veronika Ossi</a>
-        <div class="description">Has not watched anything recently</div>
-      </div>
-    </div>
-    <div class="item">
-      <i class="location arrow icon"></i>
-      <div class="content">
-        <a class="header">Veronika Ossi</a>
-        <div class="description">Has not watched anything recently</div>
-      </div>
-    </div>
-    <div class="item">
-      <i class="location arrow icon"></i>
-      <div class="content">
-        <a class="header">Veronika Ossi</a>
-        <div class="description">Has not watched anything recently</div>
-      </div>
-    </div>
-    <div class="item">
-      <i class="location arrow icon"></i>
-      <div class="content">
-        <a class="header">Last one</a>
-        <div class="description">Has not watched anything recently</div>
-      </div>
-    </div>
+      <button class="ui animated button" type="submit" tabindex="0">
+        <div class="visible content">report</div>
+        <div class="hidden content">
+          <i class="right arrow icon"></i>
+        </div>
+      </button>
+    </form>
   </div>
 </div>

@@ -1,12 +1,78 @@
 body {
   display: inline-flex;
-  background-color: #282c34;
+  /*background-color: #282c34;*/
   overflow: hidden;
+}
+
+.item>.icon {
+  color: #3cbcbb;
+  font-size: 1.4rem !important;
+}
+
+.item {
+  font-size: 1.1rem;
 }
 
 #mapid {
   height: 100vh;
   width: 70vw;
+}
+
+.icon-wrapper {
+  position: absolute;
+  width: 30vw;
+  height: 30vh;
+  bottom: 0;
+  background-image: linear-gradient(rgba(0,0,0,0), rgba(255,255,255,1), rgba(255,255,255,1));
+}
+
+.about-container {
+  position: absolute;
+  background-color: white;
+  top: 0;
+  width: 30vw;
+  z-index: 10001;
+  height: 100vh;
+  display: none;
+}
+
+.report-container {
+  position: absolute;
+  background-color: white;
+  top: 0;
+  width: 30vw;
+  z-index: 10001;
+  height: 100vh;
+  display: none;
+}
+
+#report {
+  position: absolute;
+  bottom: 5vh;
+  font-size: 2.8rem;
+  color: #3cbcbb;
+  right: 6vw;
+  z-index: 10100;
+  transition: all .2s ease-in-out;
+}
+
+#about {
+  position: absolute;
+  bottom: 5vh;
+  font-size: 2.8rem;
+  color: #3cbcbb;
+  right: 2vw;
+  z-index: 10100;
+  transition: all .2s ease-in-out;
+}
+
+#report:hover, #about:hover {
+  cursor: pointer;
+  transform: scale(1.2);
+}
+
+#reportForm {
+  padding-top: 1.4vw;
 }
 
 .form-container {
@@ -27,9 +93,15 @@ body {
 }
 
 .form>button {
-  margin: 0 2vw !important;
+  margin: 3vh 2vw !important;
   background-color: #3cbcbb !important;
   border: 0px 0px 8px 3px rgba(0,0,0,0.3) !important;
+}
+
+.heading {
+  padding-top: 5vh;
+  width: 100%;
+  text-align: center;
 }
 
 .item {
@@ -37,5 +109,5 @@ body {
 }
 
 .item:last-of-type {
-  padding-bottom: 5vw !important;
+  padding-bottom: 12vw !important;
 }
