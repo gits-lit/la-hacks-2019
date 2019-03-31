@@ -23,41 +23,9 @@
     integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
     crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.1/semantic.min.js"></script>
-  <script>
-    L.mapquest.key = '7hLeoxAL6EeSLs9z6TDaL6Tmw84yhG1U';
-
-   // 'map' refers to a <div> element with the ID map
-    const map = L.mapquest.map('mapid', {
-     center: [34.0522, -118.2437],
-     layers: L.mapquest.tileLayer('map'),
-     zoom: 13
-    });
-
-    let directions = L.mapquest.directions();
-    //directions.routeShape({
-    //  'fullShape': true
-    //}, routeShapeCallback);
-
-    function routeCallback(error, response) {
-      console.log(response);
-      let directionsLayer = L.mapquest.directionsLayer({
-        directionsResponse: response,
-        routeRibbon: {
-          color: "#3cbcbb",
-          opacity: 1.0,
-          showTraffic: false
-        }
-      }).addTo(map);
-      return map;
-    }
-    directions.route({
-      start: '453 S Spring St, Los Angeles, CA 90013',
-      end: '317 S Broadway, Los Angeles, CA 90013',
-      sessionId: '5c9fcd4b-0178-6750-02b4-171d-122f823ccac2'
-    }, routeCallback);
-
-  </script>
   <script src="/socket.io/socket.io.js"></script>
+  <script src="https://api.mqcdn.com/sdk/place-search-js/v1.0.0/place-search.js"></script>
+  <link type="text/css" rel="stylesheet" href="https://api.mqcdn.com/sdk/place-search-js/v1.0.0/place-search.css"/>
   <script src="/index.js"></script>
 </body>
 </html>

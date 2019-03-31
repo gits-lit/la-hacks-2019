@@ -78,11 +78,15 @@ io.on('connection', (socket) => {
   // User put in origin and destination, now go find the route!
   socket.on('route', async (data) => {
     console.log(data);
+    //let origin = data.origin;
+    //let destination = data.destination;
     let origin = await convertAddress(data.origin);
     let destination = await convertAddress(data.destination);
     let originLatLng = `${origin.lat},${origin.lng}`;
+    //console.log(originLatLng);
     let destinationLatLng = `${destination.lat},${destination.lng}`;
-    await findRoute(originLatLng, destinationLatLng);
+    findRoute(originLatLng, destinationLatLng);
+    //findRoute(origin, destination);
   });
 
 });
@@ -285,26 +289,22 @@ const staticMapApi = 'https://www.mapquestapi.com/staticmap/v5/map';
  * @return The route to the destination
  */
 async function findRoute(location, destination) {
-  let routeProp = {
-    key:config.mapquest,
-    from:location,
-    to:destination
-  };
-
-  // Make a request to find the route
-  await rp({url:routeApi, qs:routeProp})
-    .then(function (data) {
-      console.log(data);
-      let routeBody = JSON.parse(data).route;
-      console.log(routeBody.sessionId);
-      io.emit('session', routeBody.sessionId);
-      //console.log(`${staticMapApi}?start=${location}&end=${destination}&
-      //             size=600,400@2x&key=${config.mapquest}&session=${routeBody.sessionId}`);
-    })
-    .catch(function(err){
-      console.log(err);
-    });
-  // return
+  let routeData = {
+    start: location,//'N Central Ave, Los Angeles, CA',//routeBody.locations[0].street,
+    end: destination,//'1711 W Temple St, Los Angeles, CA',//routeBody.locations[1].street,
+    options: {
+        typeRoute: 'pedestrian',
+        routeControlPointCollection: [
+          {
+            lat: 34.066259,
+            lng: -118.44738,
+            weight: 20,
+            radius: .2
+          }
+        ]
+    }
+  }
+  io.emit('session', routeData);
   // 453 S Spring St, Los Angeles,CA
   //317 S Broadway, Los Angeles, CA
 }
