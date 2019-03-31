@@ -25,6 +25,7 @@ body {
   width: 30vw;
   height: 30vh;
   bottom: 0;
+  z-index: 20000;
   background-image: linear-gradient(rgba(0,0,0,0), rgba(255,255,255,1), rgba(255,255,255,1));
 }
 
@@ -36,7 +37,10 @@ body {
   z-index: 10001;
   height: 100vh;
   display: none;
-  padding: 30px;
+  overflow-y: scroll;
+  user-select: text;
+  -moz-user-select: text;
+  padding-bottom: 10vh;
 }
 
 .about-container p{
@@ -169,11 +173,49 @@ body {
   display: flex;
   align-items: center;
   padding: 0 1.4vw 0 0;
-  background-color: rgba(240,240,240,0.6);
-  box-shadow: 0px 0px 10px 10px rgba(240,240,240,0.4);
+  background-color: rgba(255,255,255,0.6);
+  box-shadow: 0px 0px 20px 5px rgba(255,255,255,0.4);
 }
 
 .logo-wrapper>span {
   font-size: 2.0rem;
   color: #3cbcbb;
+}
+
+.bluebold {
+  color: #3cbcbb;
+}
+
+.aboutcontent {
+  padding: 0 4vw;
+}
+
+.contact {
+  padding-bottom: 15vw;
+}
+
+.profile {
+  padding: 0 4vw;
+  display: flex;
+  align-items: center;
+}
+
+.profile>.image{
+  margin: auto;
+  float: left;
+  border-radius: 100%;
+  border: 5px solid #3cbcbb;
+  transition: all .2s ease-in-out;
+}
+
+.profile>.image:hover{
+  transform: scale(1.1);
+}
+
+.bio {
+  font-size: 1.2rem;
+}
+
+.profile>.image.right{
+  float: right!important;
 }

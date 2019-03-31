@@ -64,9 +64,10 @@ io.on('connection', (socket) => {
   });
 
   socket.on('report', async (data) => {
+    let policePhone = process.env.POLICE_PHONE || config.policePhone;
     if(data.police) {
       let body = `New crime at ${data.address} : ${data.description}`;
-      sendText(body, config.policePhone);
+      sendText(body, policePhone);
     }
     convertAddress(data.address)
       .then(
@@ -86,12 +87,12 @@ io.on('connection', (socket) => {
 
 // firebase setup
 const fb_config = {
-  apiKey: config.apiKey,
-  authDomain: config.authDomain,
-  databaseURL: config.databaseURL,
-  projectId: config.projectId,
-  storageBucket: config.storageBucket,
-  messagingSenderId: config.messagingSenderId
+  apiKey: process.env.API_KEY || config.apiKey,
+  authDomain: process.env.AUTH_DOMAIN || config.authDomain,
+  databaseURL: process.env.DATABASE_URL || config.databaseURL,
+  projectId: process.env.PROJECT_ID || config.projectId,
+  storageBucket: process.env.STORAGE_BUCKET || config.storageBucket,
+  messagingSenderId: process.env.MESSAGING_SENDER_ID || config.messagingSenderId
 }
 firebase.initializeApp(fb_config);
 console.log("firebase is setup!");
@@ -286,7 +287,7 @@ function addUser(name, number){
  */
 async function convertAddress(location){
   let properties = {
-    key: config.mapquest,
+    key: process.env.MAP_QUEST || config.mapquest,
     location: location
   }
   let options = {
@@ -349,8 +350,8 @@ async function findRoute(location, destination, pedestrian) {
 }
 
 /***** Twilio API functions *****/
-const twilioID = config.accountSid;
-const authToken = config.twilioAuthToken;
+const twilioID = process.env.TWILIO_ID || config.accountSid;
+const authToken = process.env.AUTH_TOKEN || config.twilioAuthToken;
 const client = require('twilio')(twilioID, authToken);
 
 /**
