@@ -36,6 +36,15 @@ body {
   z-index: 10001;
   height: 100vh;
   display: none;
+  padding: 30px;
+}
+
+.about-container p{
+  font-size: 20px;
+}
+
+.center{
+  text-align: center;
 }
 
 .report-container {
