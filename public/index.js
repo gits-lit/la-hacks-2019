@@ -16,7 +16,7 @@ placeSearch({
 const map = L.mapquest.map('mapid', {
  center: [34.0522, -118.2437],
  layers: L.mapquest.tileLayer('map'),
- zoom: 13
+ zoom: 15
 });
 
 let directionsLayer;
@@ -47,6 +47,30 @@ socket.on('connect', function() {
 socket.on('disconnect', function() {
   console.log('Disconnected from server');
 })
+
+
+socket.on('markers', function(data) {
+  console.log(data);
+  data.forEach(function(element) {
+    L.marker([element.lat, element.lng], {icon: redIcon}).addTo(map)
+      .bindPopup(`<b>${element.crime}</b><br>${element.name}`);
+    L.circle([element.lat, element.lng], {
+        color: 'red',
+        fillColor: '#f03',
+        fillOpacity: 0.5,
+        radius: 131
+    }).addTo(map);
+  })
+})
+
+let redIcon = new L.Icon({
+  iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
 
 $('#routeForm').submit(function(){
     let formData = {

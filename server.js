@@ -35,12 +35,7 @@ io.on('addUser', function(msg){
  * Returns the list of points to generate on front page in JSON format
  */
 app.get('/', (req, res) => {
-  let dataObject = {
-    "ok": "ok"
-  }
-  res.render("index", dataObject);
-  //return res.json({
-  //})
+  res.render("index", markers);
 })
 
 
@@ -70,6 +65,27 @@ server.listen(port, '0.0.0.0', () => {
   console.log(`Listening on Port ${port}`);
 });
 
+/* Socket.io check listen */
+io.on('connection', (socket) => {
+  console.log(`${socket} is connected`);
+  io.emit('markers', markers);
+
+  // User put in origin and destination, now go find the route!
+  socket.on('route', async (data) => {
+    //console.log(data);
+    //let origin = data.origin;
+    //let destination = data.destination;
+    let origin = await convertAddress(data.origin);
+    let destination = await convertAddress(data.destination);
+    let originLatLng = `${origin.lat},${origin.lng}`;
+    //console.log(originLatLng);
+    let destinationLatLng = `${destination.lat},${destination.lng}`;
+    findRoute(originLatLng, destinationLatLng);
+    //findRoute(origin, destination);
+  });
+
+});
+
 
 /***** Firebase Functions *****/
 
@@ -88,7 +104,10 @@ console.log("firebase is setup!");
 // firebase variables
 const db = firebase.firestore();
 const collection = db.collection("avoid-points");
-const usersCollection = db.collection("subscribed-users");
+
+/***** Points for *****/
+markers = []
+controlPoints = []
 
 // link to geocoding API
 const geocodingAPI = "http://www.mapquestapi.com/geocoding/v1/address"
@@ -97,6 +116,43 @@ let latLngDict = {
   "lat": 0,
   "lng": 0
 }
+
+function getData() {
+  // Loop through crimes in order with the forEach() method.
+  var query = collection.get()
+  .then(snapshot => {
+    if (snapshot.empty) {
+      console.log('No matching documents.');
+      return;
+    }
+
+    snapshot.forEach(doc => {
+      let dataObject = doc.data();
+      markers.push({
+        name: doc.id,
+        lat: dataObject.lat,
+        lng: dataObject.lng,
+        crime: dataObject.crime,
+        weight: dataObject.num
+      });
+
+      controlPoints.push({
+        lat: parseFloat(dataObject.lat),
+        lng: parseFloat(dataObject.lng),
+        weight: parseFloat(dataObject.num),
+        radius: .1
+      });
+      //console.log(doc.id, '=>', doc.data());
+    });
+    console.log('this is markers after adding');
+    console.log(markers);
+  })
+  .catch(err => {
+    console.log('Error getting documents', err);
+  });
+}
+
+getData();
 
 /**
  * @function addCrime Updates the database with a new crime location
@@ -109,8 +165,8 @@ let latLngDict = {
    docRef.get().
      then(function(doc){
        if (doc.exists){
-          // console.log("this entry exists already");
-          console.log(doc.data().num);
+          //console.log("this entry exists already");
+          //console.log(doc.data().num);
           let newNum = doc.data().num+1;
           docRef.update({
             "num": newNum,
