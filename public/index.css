@@ -28,4 +28,6 @@ body {
 
 .form>button {
   margin: 0 2vw !important;
+  background-color: #3cbcbb !important;
+  border: 0px 0px 8px 3px rgba(0,0,0,0.3) !important;
 }

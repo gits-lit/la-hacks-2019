@@ -2,16 +2,13 @@
 global.config = require('./config.json');
 
 /***** Import Modules *****/
+const bodyParser = require('body-parser');
 const cors = require('cors');
 const express = require('express');
 const exphbs  = require('express-handlebars');
 const path = require('path');
 const request = require('request');
-<<<<<<< HEAD
-const firebase = require("firebase");
-=======
 const firebase = require('firebase');
->>>>>>> 0a495a45eee8d4a55c1e5b62db836fa2d01e8965
 const http = require('http');
 const socket = require('socket.io');
 const rp = require('request-promise');
@@ -22,29 +19,16 @@ app.engine('handlebars', exphbs({ defaultLayout: 'main' }));
 app.set('view engine', 'handlebars');
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Socket.io is set to listen to port 3000, which should house the front-end
-const server = http.createServer(app);
-const io = socket.listen(server);
-
-/* Socket.io check listen */
-io.on('connection', (client) => {
-  console.log(`${client} is connected`);
-});
-
 /**
  * Home Page
  * Returns the list of points to generate on front page in JSON format
  */
 app.get('/', (req, res) => {
-<<<<<<< HEAD
-  // return res.json({
-=======
   let dataObject = {
     "ok": "ok"
   }
   res.render("index", dataObject);
   //return res.json({
->>>>>>> 0a495a45eee8d4a55c1e5b62db836fa2d01e8965
   //})
 })
 
@@ -55,16 +39,24 @@ app.get('/', (req, res) => {
  * Calculates the route between two locations using MapQuest's API
  * Updates the webpage to display the route and directions
  */
-app.post('/route', (req, res) => {
-});
+ /*
+app.get('/route', (req, res) => {
+  let dataObject = {
+    "ok": "ok"
+  }
+  console.log("Received form stuff");
+  console.log(req.query.origin);
+  console.log(req.query.destination);
+});*/
 
 /**
  * Handle the request for when a new crime occurs
  * Adds a new crime to the database
  * Updates the webpage to display the crime location
  */
+ /*
 app.post('/report', (req, res) => {
-});
+});*/
 
 app.post('/latlng', (req, res) => {
   console.log("request was made: /latlng");
@@ -72,10 +64,32 @@ app.post('/latlng', (req, res) => {
   res.end(JSON.stringify(req));
 });
 
-/***** Listen to port *****/
+
+/***** Ports Setup *****/
+// Socket.io is set to listen to port 3000, which should house the front-end
+const server = http.createServer(app);
+
 const port = process.env.PORT || 3000;
 server.listen(port, '0.0.0.0', () => {
   console.log(`Listening on Port ${port}`);
+});
+
+const io = socket.listen(server);
+
+/* Socket.io check listen */
+io.on('connection', (socket) => {
+  console.log(`${socket} is connected`);
+
+  // User put in origin and destination, now go find the route!
+  socket.on('route', async (data) => {
+    console.log(data);
+    let origin = await convertAddress(data.origin);
+    let destination = await convertAddress(data.destination);
+    let originLatLng = `${origin.lat},${origin.lng}`;
+    let destinationLatLng = `${destination.lat},${destination.lng}`;
+    await findRoute(originLatLng, destinationLatLng);
+  });
+
 });
 
 
@@ -112,7 +126,6 @@ let latLngDict = {
  */
  async function addCrime(location, crime) {
    let docRef = collection.doc(location);
-<<<<<<< HEAD
    this.latLngDict = await convertAddress(location);
    docRef.get().
      then(function(doc){
@@ -138,20 +151,6 @@ let latLngDict = {
   })
    .catch(function(err){
       console.log(err);
-=======
-   docRef.get().then(function(doc){
-    if (doc.exists){
-      docRef.num+=1;
-    }
-    else{
-      docRef.set({
-        "lat": 0.0, // these values would need to be looked up
-        "long": 0.0,
-        "num": 1,
-        "crime": crime
-      })
-    }
->>>>>>> 0a495a45eee8d4a55c1e5b62db836fa2d01e8965
    });
  }
 
@@ -160,8 +159,8 @@ addCrime("13138 Waco St", "some shit");
  /**
   * @function nearCrimes Makes a list of crimes that appear in the area between
   *                      two locations
-  * @param {string} location1 The first location
-  * @param {string} location2 The second location
+  * @param {Dict} location1 The first location in LatLng form
+  * @param {Dict} location2 The second location in LatLng form
   * @return {Array} An array of crime points
   */
 function nearCrimes(location1, location2) {
@@ -189,7 +188,6 @@ function nearCrimes(location1, location2) {
  * @function convertAddress Converts a String location to a lat/lng
  *
  * @param {string} location The location
-<<<<<<< HEAD
  * @return {Dict} a dict representing latitude and longitude
  */
 async function convertAddress(location){
@@ -236,16 +234,6 @@ async function convertAddress(location){
 function conversionHelper(dict){
   this.latLngDict = dict;
   console.log(dict);
-=======
- * @return {Array} An array representing latitude and longitude
- */
-function convertAddress(location){
-  // let properties = {
-  //   key: config.mapquest,
-  //   location: location
-  // }
-  // let result = JSON.parse()
->>>>>>> 0a495a45eee8d4a55c1e5b62db836fa2d01e8965
 }
 
 
@@ -262,7 +250,7 @@ const staticMapApi = 'https://www.mapquestapi.com/staticmap/v5/map';
  * @param {Array} avoidances Points to avoid
  * @return The route to the destination
  */
-function findRoute(location, destination, avoidances) {
+async function findRoute(location, destination) {
   let routeProp = {
     key:config.mapquest,
     from:location,
@@ -270,14 +258,19 @@ function findRoute(location, destination, avoidances) {
   };
 
   // Make a request to find the route
-  request({url:routeApi, qs:routeProp}, (err, response, body) => {
-    if(err) { console.log(err); return; }
-    let routeBody = JSON.parse(body).route;
-    console.log(routeBody.sessionId);
-    console.log(`${staticMapApi}?start=${location}&end=${destination}&
-                 size=600,400@2x&key=${config.mapquest}&session=${routeBody.sessionId}`);
-  });
+  await rp({url:routeApi, qs:routeProp})
+    .then(function (data) {
+      console.log(data);
+      let routeBody = JSON.parse(data).route;
+      console.log(routeBody.sessionId);
+      io.emit('session', routeBody.sessionId);
+      //console.log(`${staticMapApi}?start=${location}&end=${destination}&
+      //             size=600,400@2x&key=${config.mapquest}&session=${routeBody.sessionId}`);
+    })
+    .catch(function(err){
+      console.log(err);
+    });
   // return
+  // 453 S Spring St, Los Angeles,CA
+  //317 S Broadway, Los Angeles, CA
 }
-
-findRoute('453 S Spring St, Los Angeles,CA','317 S Broadway, Los Angeles, CA');

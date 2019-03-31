@@ -19,6 +19,7 @@
   "homepage": "https://github.com/gits-lit/la-hacks-2019#readme",
   "dependencies": {
     "cors": "^2.8.5",
-    "firebase": "^5.9.2"
+    "firebase": "^5.9.2",
+    "request-promise": "^4.2.4"
   }
 }

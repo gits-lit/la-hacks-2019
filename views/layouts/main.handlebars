@@ -41,7 +41,12 @@
     function routeCallback(error, response) {
       console.log(response);
       let directionsLayer = L.mapquest.directionsLayer({
-        directionsResponse: response
+        directionsResponse: response,
+        routeRibbon: {
+          color: "#3cbcbb",
+          opacity: 1.0,
+          showTraffic: false
+        }
       }).addTo(map);
       return map;
     }
@@ -52,5 +57,7 @@
     }, routeCallback);
 
   </script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/index.js"></script>
 </body>
 </html>

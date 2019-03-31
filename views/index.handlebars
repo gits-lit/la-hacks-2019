@@ -1,14 +1,14 @@
 <noscript>You need to enable JavaScript to run this app.</noscript>
 <div id="mapid"></div>
 <div class="form-container">
-  <form action='' method='get' class='ui form'>
+  <form action="http://127.0.0.1:3000/route" method="get" class="ui form" id="routeForm">
     <div class="field">
       <!--<label>Location</label>-->
-      <input type="text" name="first-name" placeholder="origin">
+      <input type="text" name="origin" placeholder="origin" id="origin">
     </div>
     <div class="field">
       <!--<label>Destination</label>-->
-      <input type="text" name="last-name" placeholder="destination">
+      <input type="text" name="destination" placeholder="destination" id="destination">
     </div>
     <div class="field">
       <div class="ui checkbox">
