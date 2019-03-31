@@ -64,13 +64,17 @@ io.on('connection', (socket) => {
   });
 
   socket.on('report', async (data) => {
+    if(data.police) {
+      let body = `New crime at ${data.address} : ${data.description}`;
+      sendText(body, config.policePhone);
+    }
     convertAddress(data.address)
       .then(
         async function(data2){
           console.log("BELOW IS THE COORDINATES")
           console.log(data2);
           await addCrime(data.address, data2, data.description);
-          await getData()
+          await getData();
         }
     )
   });
@@ -253,8 +257,6 @@ function nearCrimes(location1, location2) {
     // .catch(function(err){ console.log(err) });
 
     // .catch(function(err){ console.log(err) });
-
-
 }
 
 /**
