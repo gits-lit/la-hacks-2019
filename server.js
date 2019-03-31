@@ -135,6 +135,7 @@ function getData() {
     snapshot.forEach(doc => {
       let dataObject = doc.data();
       markers.push({
+        name: doc.id,
         lat: dataObject.lat,
         lng: dataObject.lng,
         crime: dataObject.crime,
