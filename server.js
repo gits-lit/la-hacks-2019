@@ -59,7 +59,7 @@ io.on('connection', (socket) => {
     let originLatLng = `${origin.lat},${origin.lng}`;
     //console.log(originLatLng);
     let destinationLatLng = `${destination.lat},${destination.lng}`;
-    findRoute(originLatLng, destinationLatLng);
+    findRoute(originLatLng, destinationLatLng, data.pedestrian);
     //findRoute(origin, destination);
   });
 
@@ -332,12 +332,16 @@ const staticMapApi = 'https://www.mapquestapi.com/staticmap/v5/map';
  * @param {Array} avoidances Points to avoid
  * @return The route to the destination
  */
-async function findRoute(location, destination) {
+async function findRoute(location, destination, pedestrian) {
+  let type = 'fastest';
+  if(pedestrian) {
+    type = 'pedestrian';
+  }
   let routeData = {
     start: location,//'N Central Ave, Los Angeles, CA',//routeBody.locations[0].street,
     end: destination,//'1711 W Temple St, Los Angeles, CA',//routeBody.locations[1].street,
     options: {
-        routeType: 'pedestrian',
+        routeType: type,
         routeControlPointCollection: controlPoints
     }
   }
