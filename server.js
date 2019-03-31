@@ -2,13 +2,12 @@
 global.config = require('./config.json');
 
 /***** Import Modules *****/
-const bodyParser = require('body-parser');
 const cors = require('cors');
 const express = require('express');
 const exphbs  = require('express-handlebars');
 const path = require('path');
 const request = require('request');
-const firebase = require('firebase');
+const firebase = require("firebase");
 const http = require('http');
 const socket = require('socket.io');
 const rp = require('request-promise');
@@ -19,6 +18,18 @@ app.engine('handlebars', exphbs({ defaultLayout: 'main' }));
 app.set('view engine', 'handlebars');
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Socket.io is set to listen to port 3000, which should house the front-end
+const server = http.createServer(app);
+const io = socket.listen(server);
+
+/* Socket.io check listen */
+io.on('connection', (client) => {
+  console.log(`${client} is connected`);
+});
+
+io.on('addUser', function(msg){
+  addUser(msg.name, msg.phone);
+})
 /**
  * Home Page
  * Returns the list of points to generate on front page in JSON format
@@ -32,6 +43,7 @@ app.get('/', (req, res) => {
   //})
 })
 
+
 /***** Requests *****/
 
 /**
@@ -39,61 +51,23 @@ app.get('/', (req, res) => {
  * Calculates the route between two locations using MapQuest's API
  * Updates the webpage to display the route and directions
  */
- /*
-app.get('/route', (req, res) => {
-  let dataObject = {
-    "ok": "ok"
-  }
-  console.log("Received form stuff");
-  console.log(req.query.origin);
-  console.log(req.query.destination);
-});*/
+app.post('/route', (req, res) => {
+});
 
 /**
  * Handle the request for when a new crime occurs
  * Adds a new crime to the database
  * Updates the webpage to display the crime location
  */
- /*
 app.post('/report', (req, res) => {
-});*/
-
-app.post('/latlng', (req, res) => {
-  console.log("request was made: /latlng");
-  res.writeHead(200, {'Content-Type': 'application/json'});
-  res.end(JSON.stringify(req));
 });
 
 
-/***** Ports Setup *****/
-// Socket.io is set to listen to port 3000, which should house the front-end
-const server = http.createServer(app);
 
+/***** Listen to port *****/
 const port = process.env.PORT || 3000;
 server.listen(port, '0.0.0.0', () => {
   console.log(`Listening on Port ${port}`);
-});
-
-const io = socket.listen(server);
-
-/* Socket.io check listen */
-io.on('connection', (socket) => {
-  console.log(`${socket} is connected`);
-
-  // User put in origin and destination, now go find the route!
-  socket.on('route', async (data) => {
-    console.log(data);
-    //let origin = data.origin;
-    //let destination = data.destination;
-    let origin = await convertAddress(data.origin);
-    let destination = await convertAddress(data.destination);
-    let originLatLng = `${origin.lat},${origin.lng}`;
-    //console.log(originLatLng);
-    let destinationLatLng = `${destination.lat},${destination.lng}`;
-    findRoute(originLatLng, destinationLatLng);
-    //findRoute(origin, destination);
-  });
-
 });
 
 
@@ -114,15 +88,16 @@ console.log("firebase is setup!");
 // firebase variables
 const db = firebase.firestore();
 const collection = db.collection("avoid-points");
-
+const usersCollection = db.collection("subscribed-users");
 
 // link to geocoding API
 const geocodingAPI = "http://www.mapquestapi.com/geocoding/v1/address"
-// conversion
+// variable used for conversion
 let latLngDict = {
   "lat": 0,
-  "long": 0
+  "lng": 0
 }
+
 /**
  * @function addCrime Updates the database with a new crime location
  * @param {string} location The location of the crime
@@ -134,20 +109,21 @@ let latLngDict = {
    docRef.get().
      then(function(doc){
        if (doc.exists){
-          console.log("this entry exists already");
+          // console.log("this entry exists already");
           console.log(doc.data().num);
           let newNum = doc.data().num+1;
           docRef.update({
-            "num": newNum
+            "num": newNum,
+            "crime": crime
           })
        }
        else{
-          console.log("this entry does not exist");
+          // console.log("this entry does not exist");
           // console.log(this.latLngDict["lat"]);
           // console.log(this.latLngDict["long"])
           docRef.set({
             "lat": this.latLngDict["lat"], // these values would need to be looked up
-            "long": this.latLngDict["lng"],
+            "lng": this.latLngDict["lng"],
             "num": 1,
             "crime": crime
           });
@@ -158,35 +134,93 @@ let latLngDict = {
    });
  }
 
-addCrime("13138 Waco St", "some shit");
+// addCrime("13138 Waco St", "some shit");
 
  /**
   * @function nearCrimes Makes a list of crimes that appear in the area between
   *                      two locations
-  * @param {Dict} location1 The first location in LatLng form
-  * @param {Dict} location2 The second location in LatLng form
+  * @param {string} location1 The first location
+  * @param {string} location2 The second location
   * @return {Array} An array of crime points
   */
 function nearCrimes(location1, location2) {
-  let geoLoc1 = convertAddress(location1);
-  let geoLoc2 = convertAddress(location2);
-  let query;
-  if (geoLoc1["lat"] > geoLoc2["lat"]){
-    query = collection.where("lat", "<=", geoLoc1["lat"]).where("lat", ">=", geoLoc2["lat"]);
-  }
-  else{
-    query = collection.where("lat", ">=", geoLoc1["lat"]).where("lat", "<=", geoLoc2["lat"]);
-  }
+  let geoLoc1;
+  let geoLoc2;
+  let dbQuery;
+  let array = [];
+  convertAddress(location1)
+    .then(function(data){
+      geoLoc1 = this.latLngDict;
+      convertAddress(location2);
+    })
+    .then(function(){
+      geoLoc2 = this.latLngDict;
+      let query;
+      console.log("GeoLoc1: " + geoLoc1);
+      console.log("GeoLoc2: " +  geoLoc2);
 
-  if (geoLoc1["long"] > geoLoc2["long"]){
-    query = collection.where("long", "<=", geoLoc1["long"]).where("long", ">=", geoLoc2["long"]);
-  }
-  else{
-    query = collection.where("long", ">=", geoLoc1["long"]).where("long", "<=", geoLoc2["long"]);
-  }
+      // finding crime locations between two latitudes
+      if (geoLoc1["lat"] > geoLoc2["lat"]){
+        console.log(1);
+        query = collection.where("lat", "<=", geoLoc1["lat"]).where("lat", ">=", geoLoc2["lat"]);
+      }
+      else{
+        console.log(2);
+        query = collection.where("lat", ">=", geoLoc1["lat"]).where("lat", "<=", geoLoc2["lat"]);
+      }
+
+      // finding crime locations between two longitudes
+      if (geoLoc1["lng"] > geoLoc2["lng"]){
+        console.log(3);
+        query = collection.where("lng", "<=", geoLoc1["lng"]).where("lng", ">=", geoLoc2["lng"]);
+      }
+      else{
+        console.log(4);
+        query = collection.where("lng", "<=", geoLoc1["lng"]).where("lng", ">=", geoLoc2["lng"]);
+      }
+
+
+      dbQuery = query;
+      console.log("Iterating through query.");
+      collection.get()
+        .then(function(querySnapshot) {
+           querySnapshot.forEach(function (doc){
+             array.push(doc.data());
+           })
+        })
+        .catch(function (err){
+           console.log("Error querying documents: " + err);
+        });
+    });
+    console.log("Length of Array: " + array.length);
+    return array;
+
+
+    // .catch(function(err){ console.log(err) });
+
+    // .catch(function(err){ console.log(err) });
+
+
 }
 
-
+/**
+ * Function that adds user to the subscription
+ * @param {string} name the name of the person being added
+ * @param {string} number the phone number of the person
+ */
+function addUser(name, number){
+  userRef = usersCollection.doc(number);
+  userRef.get()
+    .then(function(doc){
+      userRef.set({
+         "name": name
+      });
+  })
+    .catch(function(err){
+      console.log(err);
+  });
+  console.log("added user: " + name);
+}
 
 /**
  * @function convertAddress Converts a String location to a lat/lng
@@ -199,20 +233,6 @@ async function convertAddress(location){
     key: config.mapquest,
     location: location
   }
-  // rp({url:geocodingAPI, qs:properties}, function(err, response, body) {
-  //   if(err) { console.log(err); return; }
-  //   // console.log(body);
-  //   let dict = JSON.parse(body);
-  //   let latLng = dict["results"][0]["locations"][0]["latLng"];
-  //   dict = latLng;
-  //   return dict
-  // }).then(function(dict){
-  //   let arr = [dict["lat"], dict["lng"]];
-  //   return arr;
-  // }).catch(function(err){
-  //   console.log("conversion failed");
-  // });
-
   let options = {
     uri: geocodingAPI,
     qs: properties,
@@ -233,12 +253,16 @@ async function convertAddress(location){
   return this.latLngDict;
 }
 
-
-
+/**
+ * Helper method to store relevant JSON data into a global variable
+ * @param {dict} dict dictionary representing the JSON values
+ */
 function conversionHelper(dict){
   this.latLngDict = dict;
-  console.log(dict);
+  // console.log(dict);
 }
+
+
 
 
 /***** MapQuest API Functions *****/
@@ -254,23 +278,61 @@ const staticMapApi = 'https://www.mapquestapi.com/staticmap/v5/map';
  * @param {Array} avoidances Points to avoid
  * @return The route to the destination
  */
-async function findRoute(location, destination) {
-  let routeData = {
-    start: location,//'N Central Ave, Los Angeles, CA',//routeBody.locations[0].street,
-    end: destination,//'1711 W Temple St, Los Angeles, CA',//routeBody.locations[1].street,
-    options: {
-        typeRoute: 'pedestrian',
-        routeControlPointCollection: [
-          {
-            lat: 34.066259,
-            lng: -118.44738,
-            weight: 20,
-            radius: .2
-          }
-        ]
+function findRoute(location, destination, avoidances) {
+  let routeProp = {
+    key:config.mapquest,
+    from:location,
+    to:destination,
+    routeControlPointCollection: avoidances
+  };
+  // Make a request to find the route
+  request({url:routeApi, qs:routeProp}, (err, response, body) => {
+    if(err) { console.log(err); return; }
+    let routeBody = JSON.parse(body).route;
+    console.log(routeBody);
+    console.log(routeBody.sessionId);
+    console.log(`${staticMapApi}?start=${location}&end=${destination}&
+                 size=600,400@2x&key=${config.mapquest}&session=${routeBody.sessionId}`);
+  });
+  // return
+}
+
+/***** Twilio API functions *****/
+const twilioID = config.accountSid;
+const authToken = config.twilioAuthToken;
+const client = require('twilio')(twilioID, authToken);
+
+/**
+ * Method to send text to all users when a crime has been committed
+ * @param {string} body the message to send
+ * @param {string} number the phone number to text
+ */
+function sendText(body, number){
+  console.log('send text');
+  client.messages
+    .create({
+      body: body,
+      from: '+16087193809',
+      to: number
+    })
+    .then(message => console.log(message.sid));
+}
+
+
+
+const exOrigin = '453 S Spring St, Los Angeles,CA';
+const exDestination = '317 S Broadway, Los Angeles, CA'
+
+// addCrime('357 S Broadway, Los Angeles, CA 90013', 'homicide');
+// findRoute(exOrigin, exDestination, nearCrimes(exOrigin, exDestination));
+// sendText("uwu", '+17147869188');
+
+// helper method to delay
+function sleep(milliseconds) {
+  var start = new Date().getTime();
+  for (var i = 0; i < 1e7; i++) {
+    if ((new Date().getTime() - start) > milliseconds){
+      break;
     }
   }
-  io.emit('session', routeData);
-  // 453 S Spring St, Los Angeles,CA
-  //317 S Broadway, Los Angeles, CA
 }
