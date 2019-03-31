@@ -74,10 +74,11 @@ const io = socket.listen(server);
 /* Socket.io check listen */
 io.on('connection', (socket) => {
   console.log(`${socket} is connected`);
+  io.emit('markers', markers);
 
   // User put in origin and destination, now go find the route!
   socket.on('route', async (data) => {
-    console.log(data);
+    //console.log(data);
     //let origin = data.origin;
     //let destination = data.destination;
     let origin = await convertAddress(data.origin);
@@ -132,7 +133,7 @@ function getData() {
     }
 
     snapshot.forEach(doc => {
-      let dataObject = doc.data;
+      let dataObject = doc.data();
       markers.push({
         lat: dataObject.lat,
         lng: dataObject.lng,
@@ -145,16 +146,17 @@ function getData() {
         lng: parseFloat(dataObject.lng),
         weight: parseFloat(dataObject.num),
         radius: .1
-      })
-      console.log(doc.id, '=>', doc.data());
+      });
+      //console.log(doc.id, '=>', doc.data());
     });
+    console.log('this is markers after adding');
+    console.log(markers);
   })
   .catch(err => {
     console.log('Error getting documents', err);
   });
 }
 
-console.log("Get data called");
 getData();
 
 /**
@@ -168,15 +170,15 @@ getData();
    docRef.get().
      then(function(doc){
        if (doc.exists){
-          console.log("this entry exists already");
-          console.log(doc.data().num);
+          //console.log("this entry exists already");
+          //console.log(doc.data().num);
           let newNum = doc.data().num+1;
           docRef.update({
             "num": newNum
           })
        }
        else{
-          console.log("this entry does not exist");
+          //console.log("this entry does not exist");
           // console.log(this.latLngDict["lat"]);
           // console.log(this.latLngDict["long"])
           docRef.set({
@@ -271,7 +273,7 @@ async function convertAddress(location){
 
 function conversionHelper(dict){
   this.latLngDict = dict;
-  console.log(dict);
+  //console.log(dict);
 }
 
 
@@ -293,15 +295,8 @@ async function findRoute(location, destination) {
     start: location,//'N Central Ave, Los Angeles, CA',//routeBody.locations[0].street,
     end: destination,//'1711 W Temple St, Los Angeles, CA',//routeBody.locations[1].street,
     options: {
-        typeRoute: 'pedestrian',
-        routeControlPointCollection: [
-          {
-            lat: 34.066259,
-            lng: -118.44738,
-            weight: 20,
-            radius: .2
-          }
-        ]
+        //typeRoute: 'pedestrian',
+        routeControlPointCollection: controlPoints
     }
   }
   io.emit('session', routeData);
