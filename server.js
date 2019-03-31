@@ -144,7 +144,7 @@ function getData() {
     console.log('this is markers after adding');
     console.log(markers);
     if(notEmpty) {
-      io.emit("markers", markers)
+      io.emit('markers', markers);
     }
   })
   .catch(err => {
@@ -166,7 +166,7 @@ getData();
        if (doc.exists){
           //console.log("this entry exists already");
           //console.log(doc.data().num);
-          let newNum = doc.data().num+1;
+          let newNum = doc.data().num+20;
           docRef.update({
             "num": newNum,
             "crime": crime
@@ -179,7 +179,7 @@ getData();
           docRef.set({
             "lat": latLngTemp["lat"], // these values would need to be looked up
             "lng": latLngTemp["lng"],
-            "num": 1,
+            "num": 20,
             "crime": crime
           });
        }

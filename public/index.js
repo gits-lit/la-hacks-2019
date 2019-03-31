@@ -90,20 +90,41 @@ socket.on('disconnect', function() {
   console.log('Disconnected from server');
 })
 
+let layerGroup;
 
 socket.on('markers', function(data) {
 
+  if(typeof layerGroup !== 'undefined') {
+    map.removeLayer(layerGroup);
+  }
+
+  layerGroup = L.layerGroup().addTo(map);
+
   data.forEach(function(element) {
-    L.marker([element.lat, element.lng], {icon: redIcon}).addTo(map)
-      .bindPopup(`<b>${element.crime}</b><br>${element.name}`);
-    L.circle([element.lat, element.lng], {
-        color: 'red',
-        fillColor: '#f03',
-        fillOpacity: 0.5,
-        radius: 131
-    }).addTo(map);
-  })
-})
+    let marker = L.marker([element.lat, element.lng], {icon: redIcon})
+          .bindPopup(`<b>${element.crime}</b><br>${element.name}`);
+    let circle = L.circle([element.lat, element.lng], {
+      color: 'red',
+      fillColor: '#f03',
+      fillOpacity: 0.5,
+      radius: 131
+    });
+    layerGroup.addLayer(circle);
+    layerGroup.addLayer(marker);
+  });
+});
+
+/*
+socket.on('newcrime', function(element) {
+  L.marker([element.lat, element.lng], {icon: redIcon}).addTo(map)
+    .bindPopup(`<b>${element.crime}</b><br>${element.name}`);
+  L.circle([element.lat, element.lng], {
+    color: 'red',
+    fillColor: '#f03',
+    fillOpacity: 0.5,
+    radius: 131
+  }).addTo(map);
+})*/
 
 let redIcon = new L.Icon({
   iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
