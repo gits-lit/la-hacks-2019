@@ -22,6 +22,27 @@ const map = L.mapquest.map('mapid', {
 let directionsLayer;
 
 let directions = L.mapquest.directions();
+/*
+directions.setLayerOptions({
+  startMarker: {
+    //icon: 'circle',
+    iconOptions: {
+      size: 'sm',
+      primaryColor: "#EFEFEF",
+      secondaryColor: '#FFFFFF',
+      //symbol: 'A'
+    }
+  },
+  endMarker: {
+    //icon: 'circle',
+    iconOptions: {
+      size: 'sm',
+      primaryColor: '#000000',
+      secondaryColor: '#000000',
+      //symbol: 'B'
+    }
+  },
+});*/
 
 function routeCallback(error, response) {
   if(typeof directionsLayer !== 'undefined') {
@@ -29,6 +50,24 @@ function routeCallback(error, response) {
   }
   directionsLayer = L.mapquest.directionsLayer({
     directionsResponse: response,
+    startMarker: {
+      icon: 'marker',
+      iconOptions: {
+        size: 'sm',
+        primaryColor: "#3cbcbb",
+        secondaryColor: '#FFFFFF',
+        symbol: 'a'
+      }
+    },
+    endMarker: {
+      icon: 'marker',
+      iconOptions: {
+        size: 'sm',
+        primaryColor: "#3cbcbb",
+        secondaryColor: '#FFFFFF',
+        symbol: 'b'
+      }
+    },
     routeRibbon: {
       color: "#3cbcbb",
       opacity: 1.0,
@@ -36,6 +75,8 @@ function routeCallback(error, response) {
     }
   }).addTo(map);
   let directions = document.getElementById("directions");
+
+
   while (directions.firstChild) {
       directions.removeChild(directions.firstChild);
   }
