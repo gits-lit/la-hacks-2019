@@ -20,6 +20,7 @@
   "dependencies": {
     "cors": "^2.8.5",
     "firebase": "^5.9.2",
-    "request-promise": "^4.2.4"
+    "request-promise": "^4.2.4",
+    "twilio": "^3.30.0"
   }
 }

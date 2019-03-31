@@ -16,7 +16,7 @@ placeSearch({
 const map = L.mapquest.map('mapid', {
  center: [34.0522, -118.2437],
  layers: L.mapquest.tileLayer('map'),
- zoom: 13
+ zoom: 15
 });
 
 let directionsLayer;
@@ -90,11 +90,12 @@ socket.on('disconnect', function() {
   console.log('Disconnected from server');
 })
 
+
 socket.on('markers', function(data) {
-  console.log(data);
+
   data.forEach(function(element) {
     L.marker([element.lat, element.lng], {icon: redIcon}).addTo(map)
-      .bindPopup(`<b>${element.crime}</b>`);
+      .bindPopup(`<b>${element.crime}</b><br>${element.name}`);
     L.circle([element.lat, element.lng], {
         color: 'red',
         fillColor: '#f03',
@@ -128,9 +129,11 @@ $('#routeForm').submit(function(){
   });
 
   $('#reportForm').submit(function(){
+      let checked = document.getElementById("police").checked;
       let formData = {
         address: $('#address').val(),
-        description: $('#description').val()
+        description: $('#description').val(),
+        police: checked
       }
 
       socket.emit('report', formData);
@@ -149,9 +152,11 @@ socket.on('session', function(data) {
 /** Animation stuff **/
 $('#about').click(function() {
   $('.about-container').toggle('slide', {direction: "right" }, 500);
+  $('.report-container').hide('slide', {direction: 'right'}, 500);
 });
 $('#report').click(function() {
   $('.report-container' ).toggle('slide', {direction: "right" }, 500);
+  $('.about-container').hide('slide', {direction: 'right'}, 500);
   $('#reportForm').removeClass('success');
 });
 
