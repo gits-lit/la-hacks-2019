@@ -2,6 +2,8 @@ body {
   display: inline-flex;
   /*background-color: #282c34;*/
   overflow: hidden;
+  user-select: none;
+  -moz-user-select: none;
 }
 
 .item>.icon {
@@ -14,7 +16,7 @@ body {
 }
 
 #mapid {
-  height: 100vh;
+  height: 105vh;
   width: 70vw;
 }
 
@@ -144,4 +146,25 @@ body {
 
 .item:last-of-type {
   padding-bottom: 12vw !important;
+}
+
+.logo {
+  width: 5vw;
+}
+
+.logo-wrapper {
+  position: absolute;
+  bottom: 2vh;
+  left: 2vw;
+  z-index: 20000;
+  display: flex;
+  align-items: center;
+  padding: 0 1.4vw 0 0;
+  background-color: rgba(240,240,240,0.6);
+  box-shadow: 0px 0px 10px 10px rgba(240,240,240,0.4);
+}
+
+.logo-wrapper>span {
+  font-size: 2.0rem;
+  color: #3cbcbb;
 }
