@@ -34,6 +34,7 @@ body {
   z-index: 10001;
   height: 100vh;
   display: none;
+  padding: 30px;
 }
 
 .report-container {
